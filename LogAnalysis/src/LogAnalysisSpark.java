@@ -19,8 +19,8 @@ public final class LogAnalysisSpark {
 	private static final Pattern SPACE = Pattern.compile(" ");
 	static String appName="LogAnalysisSpark";
 	static String master="local[1]";
-	static ArrayList<String> folders = new ArrayList();
-	static ArrayList<String> files = new ArrayList();
+	static ArrayList<String> folders = new ArrayList<String>();
+	static ArrayList<String> files = new ArrayList<String>();
 	
 	public static void getFileAndFolders(String s){
 		  File folder = new File(s);
