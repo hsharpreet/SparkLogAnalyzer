@@ -35,7 +35,7 @@ public final class LogAnalysisSpark {
 				  folders.add(listOfFiles[i].getAbsolutePath());
 			  }
 		  }
-	}
+	} 
   
 	public static void main(String[] args) throws Exception {
 
