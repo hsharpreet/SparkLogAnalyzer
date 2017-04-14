@@ -39,9 +39,12 @@ public final class LogAnalysisSpark {
   
 	public static void main(String[] args) throws Exception {
 
-		String path = "/Users/Harpreet/Documents/STS_WS/LogAnalysis/input";
-		File[] dirs = new File(path).listFiles(File::isDirectory);
-		getFileAndFolders(path);
+		String inputPath = "/Users/Harpreet/logAnalyze/LogAnalysis/input";
+		String outputPath = "/Users/Harpreet/logAnalyze/LogAnalysis/output";
+		String file = "/Users/Harpreet/logAnalyze/LogAnalysis/input/iliad/part-00000";
+		
+		File[] dirs = new File(inputPath).listFiles(File::isDirectory);
+		getFileAndFolders(inputPath);
 		
 		System.out.println("folders: \n");
         for(String f: folders){
@@ -63,18 +66,28 @@ public final class LogAnalysisSpark {
     
     SparkSession spark = SparkSession.builder().appName("LogAnalysisSpark").getOrCreate();
 
-    JavaRDD<String> lines = spark.read().textFile(args[0]).javaRDD();
+    JavaRDD<String> textFile = sc.textFile(file);
+    
+    /*JavaPairRDD<String, Integer> counts = textFile
+        .flatMap(s -> Arrays.asList(s.split(" ")).iterator())
+        .mapToPair(word -> new Tuple2<>(word, 1))
+        .reduceByKey((a, b) -> a + b);
+    counts.saveAsTextFile(outputPath+"/1");*/
+    
+    JavaRDD<String> lines0 = textFile
+    		.flatMap(s -> Arrays.asList(SPACE.split(s)).iterator())
+    		.filter(s -> s.equalsIgnoreCase("iliad"));
 
-    JavaRDD<String> words = lines.flatMap(s -> Arrays.asList(SPACE.split(s)).iterator());
-
-    JavaPairRDD<String, Integer> ones = words.mapToPair(s -> new Tuple2<>("iliad", 1));
-
-    JavaPairRDD<String, Integer> counts = ones.reduceByKey((i1, i2) -> i1 + i2);
-    counts.saveAsTextFile("file:///Users/Harpreet/Documents/STS_WS/LogAnalysis/output/1)");
-    List<Tuple2<String, Integer>> output = counts.collect();
+    JavaPairRDD<String, Integer> ones0 = lines0.mapToPair(s -> new Tuple2<>(s, 1));
+    
+    JavaPairRDD<String, Integer> counts1 = ones0.reduceByKey((i1, i2) -> i1 + i2);
+    counts1.saveAsTextFile(outputPath+"/1");
+    
+    List<Tuple2<String, Integer>> output = counts1.collect();
     for (Tuple2<?,?> tuple : output) {
       System.out.println(tuple._1() + ": " + tuple._2());
     }
+   
     spark.stop();
   }
 }
